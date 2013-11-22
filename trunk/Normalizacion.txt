@@ -1,0 +1,153 @@
+/* Normalización */
+
+Para facilitar la lectura abreviamos:
+
+V:  videoID
+V1: vNombre
+V2: vMetadatos*
+
+P:  paqueteID
+P1: pDescripcion
+P2: pCantVideos
+P3: pDinamico
+
+O:  ofertaID
+O1: oDescripcion
+O2: oPrecio
+O3: oRepros
+O4: oTiempoLim
+
+C:  clienteID
+C1: cNombre
+C2: cDatos*
+
+Q:  promoID
+Q1: qRequiere(N)
+Q2: qBeneficia(M)
+Q3: qDescuento(Z)
+Q4: qFechaLim
+Q5: qDuracion
+
+VC1: vcReprosRest
+VC2: vcTiempoRest
+
+CQ1: cqBenefRest
+CQ2: cqFechaInicial
+
+/* Esquema Universal */
+
+R = (
+    V, V1, V2,
+    P, P1, P2, P3,
+    O, O1, O2, O3, O4,
+    C, C1, C2,
+    Q, Q1, Q2, Q3, Q4, Q5,
+    VC1, VC2,
+    CQ1, CQ2
+    )
+
+/* Dependencias funcionales */
+
+F = {
+    V -> V1, V2
+    P -> P1, P2, P3
+    O -> O1, O2, O3, O4
+    C -> C1, C2
+    Q -> Q1, Q2, Q3, Q4, Q5
+    C, V -> VC1, VC2
+    C, Q -> CQ1, CQ2
+    }
+
+/* Algoritmo BCNF */
+
+Esto nos resultará útil para chequear la pertenencia a F+ en los pasos siguientes
+Corremos el algoritmo de BCNF:
+V+ = {V, V1, V2}
+P+ = {P, P1, P2, P3}
+O+ = {O, O1, O2, O3, O4}
+C+ = {C, C1, C2}
+Q+ = {Q, Q1, Q2, Q3, Q4, Q5}
+(C, V)+ = {C, V, VC1, VC2, C1, C2, V1, V2}
+(C, Q)+ = {C, Q, CQ1, CQ2, C1, C2, Q1, Q2, Q3, Q4, Q5}
+
+Partimos con R0 = R, que no esta en BCNF, pues existe una dependencia no trivial
+que no es de superclave
+
+Descomponemos a R de la siguiente forma:
+1. R1 = (V, P, P1, P2, P3, O, O1, O2, O3, O4, C, C1, C2, Q, Q1, Q2, Q3, Q4, Q5,
+         VC1, VC2, CQ1, CQ2)
+   Obtengo: (V, V1, V2)
+Pues V -> V1, V2 es no trivial y V -> R0 no está en F0 y además:
+V ⋂ {V1, V2} = ∅
+
+Los pasos siguientes son similares:
+2. R2 = (V, P, O, O1, O2, O3, O4, C, C1, C2, Q, Q1, Q2, Q3, Q4, Q5, VC1, VC2, CQ1, CQ2)
+   Obtengo: (P, P1, P2, P3)
+
+3. R3 = (V, P, O, C, C1, C2, Q, Q1, Q2, Q3, Q4, Q5, VC1, VC2, CQ1, CQ2)
+   Obtengo: (O1, O2, O3, O4)
+
+4. R4 = (V, P, O, C, Q, Q1, Q2, Q3, Q4, Q5, VC1, VC2, CQ1, CQ2)
+   Obtengo: (C, C1, C2)
+
+5. R5 = (V, P, O, C, Q, VC1, VC2, CQ1, CQ2)
+   Obtengo: (Q, Q1, Q2, Q3, Q4, Q5)
+
+6. R6 = (V, P, O, C, Q, CQ1, CQ2)
+   Obtengo: (C, V, VC1, VC2)
+
+7. R7 = (V, P, O, C, Q)
+   Obtengo: (C, Q, CQ1, CQ2)
+
+8. Ahora el esquema R7 está en BCNF, pues existe la dependencia trivial:
+   V, P, O, C, Q -> V, P, O, C, Q
+
+Por lo que obtenemos la descomposición:
+
+(videoID, vNombre, vMetadatos)
+(paqueteID, pDescripcion, pCantVideos, pDinamico)
+(ofertaID, oDescripcion, oPrecio, oRepros, oTiempoLim)
+(clienteID, cNombre, cDatos)
+(promoID, qRequiere(N), qBeneficia(M), qDescuento(Z), qFechaLim, qDuracion)
+(clienteID, videoID, vcReprosRest, vcRTiempoRest)
+(clienteID, promoID, cqBenefRest, cqFechaInicial)
+
+/* Fin */
+
+/* Algoritmo 3FN: */
+
+Fc = F
+
+Primera Parte:
+(V, V1, V2)
+(P, P1, P2, P3)
+(O, O1, O2, O3, O4)
+(C, C1, C2)
+(Q, Q1, Q2, Q3, Q4, Q5)
+(C, V, VC1, VC2)
+(C, Q, CQ1, CQ2)
+
+Segunda Parte:
+(V, P, O, C, Q)
+
+Obtenemos:
+Lo mismo que een BCNF y además:
+(videoID, paqueteID, ofertaID, clienteID, promoID)
+
+/* Fin */
+
+/* Conclusión */
+BCNF generó menos esquemas que los obtenidos anteriormente en la reducción a
+tablas del modelo ER, sin embargo no se perdio ninguna dependencia funcional en
+la descomposición.
+3NF devolvió los mismos esquemas obtenidos en BCNF, con la excepción de un
+esquema nuevo, compuesto por todas las claves primarias correspondientes al
+modelo ER. También se preservaron las dependencias.
+Decidmos no elegir la descomposición BCNF obtenida, pues no genero algunas de 
+las tablas sí presentes anteriormente.
+Decidimos tampoco elegir 3NF, pues, si bien nos permite relacionar los distintos
+esquemas correspondientes previamente a "entidades", lo hace de una manera
+ineficiente. Esto se debe a que el último esquema obtenido, posee las claves de
+los esquemas obtenidos previamente y conlleva al manejo de valores nulos
+EXPLICAR
+Por lo tanto, decidimos quedarnos con los esquemas del modelo ER.
