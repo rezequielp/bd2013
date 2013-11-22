@@ -1,0 +1,42 @@
+/* Reducción a tablas del diagrama ER */
+
+/* Entidades*/
+
+Video:
+(videoID, vNombre, vMetadatos)
+
+Paquete:
+(paqueteID, pDescripcion, pCantVideos, pDinamico)
+
+Oferta:
+(ofertaID, oDescripcion, oPrecio, oRepros, oTiempoLim)
+
+Cliente:
+(clienteID, cNombre, cDatos)
+
+Promoción:
+(promoID, qRequiere, qBeneficia, qDescuento, qFechaLim, qDuracion)
+
+
+/* Relaciones */
+
+Vid-Paq:
+(videoID, paqueteID)
+
+Vid-Cli
+(videoID, clienteID, vcReprosRest, vcRTiempoRest)
+
+Vid-Ofer:
+(videoID, ofertaID)
+
+Paq-Ofer:
+(paqueteID, ofertaID)
+
+Ofer-Cli:
+(ofertaID, clienteID)
+
+Ofer-Pro
+(ofertaID, promoID)
+
+Cli-Pro
+(clienteID, promoID, cqBenefRest, cqFechaInicial)

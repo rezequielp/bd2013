@@ -1,0 +1,23 @@
+/* Esquema Universal */
+
+R = (
+    videoID, vNombre, vMetadatos,
+    paqueteID, pDescripcion, pCantVideos, pDinamico,
+    ofertaID, oDescripcion, oPrecio, oRepros, oTiempoLim,
+    clienteID, cNombre, cDatos,
+    promoID, qRequiere(N), qBeneficia(M), qDescuento(Z), qFechaLim, qDuracion,
+    vcReprosRest, vcRTiempoRest,
+    cqBenefRest, cqFechaInicial
+    )
+
+/* Dependencias funcionales */
+
+F = {
+    videoID -> vNombre, vMetadatos
+    paqueteID -> pDescripcion, pCantVideos, pDinamico
+    ofertaID -> oDescripcion, oPrecio, oRepros, oTiempoLim
+    clienteID -> cNombre, cDatos
+    promoID -> qRequiere, qBeneficia, qDescuento, qFechaLim, qDuracion
+    clienteID, videoID -> vcReprosRest, vcTiempoRest
+    clienteID, promoID -> cqBenefRest, cqFechaInicial
+    }
