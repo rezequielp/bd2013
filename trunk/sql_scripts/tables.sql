@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS `video`;
 
 CREATE TABLE `video` (
   `video_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(50) NOT NULL,
+  `title` VARCHAR(100) NOT NULL,
   `genre` VARCHAR(20) NOT NULL,
   PRIMARY KEY (`video_id`))
 DEFAULT CHARACTER SET = utf8;
@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `package` ;
 
 CREATE TABLE IF NOT EXISTS `package` (
   `package_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `p_description` VARCHAR(100) NOT NULL,
+  `p_description` VARCHAR(200) NOT NULL,
   `dynamic` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`package_id`))
 DEFAULT CHARACTER SET = utf8;
@@ -96,15 +96,19 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table Vid-Offer-Cli
 -- -----------------------------------------------------
--- AGREGAR `purchase_date` A LA DOC
-DROP TABLE IF EXISTS `vid_offer_cli` ;
+-- AGREGAR `max_plays` A LA DOC
+-- AGREGAR `deadline` A LA DOC
+-- plays y max_plays no se resetean, uno cuenta la cant. de repr. hechas y el otro las max permitidas
+-- deadline tiempo calendario que marca el vencimiento de la activacion del video
+DROP TABLE IF EXISTS `vid_cli` ;
 
-CREATE TABLE IF NOT EXISTS `vid_offer_cli` (
+CREATE TABLE IF NOT EXISTS `vid_cli` (
   `video_id` SMALLINT UNSIGNED NOT NULL,
   `offer_id` SMALLINT UNSIGNED NOT NULL,
   `client_id` SMALLINT UNSIGNED,
   `plays` SMALLINT UNSIGNED NOT NULL,
-  `purchase_date` DATE NOT NULL,
+  `max_plays` SMALLINT UNSIGNED NOT NULL,
+  `deadline` DATE NOT NULL,
   PRIMARY KEY (`video_id`, `offer_id`, `client_id`),
   FOREIGN KEY (`video_id`)
     REFERENCES `video`(`video_id`)
@@ -187,7 +191,8 @@ CREATE TABLE IF NOT EXISTS `offer_cli` (
   `offer_id` SMALLINT UNSIGNED NOT NULL,
   `client_id` SMALLINT UNSIGNED NOT NULL,
   `purchase_date` DATE NOT NULL,
-  PRIMARY KEY (`offer_id`, `client_id`),
+  `charge` SMALLINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`offer_id`, `client_id`, `purchase_date`),
   FOREIGN KEY (`offer_id`)
     REFERENCES `offer`(`offer_id`)
     ON DELETE CASCADE

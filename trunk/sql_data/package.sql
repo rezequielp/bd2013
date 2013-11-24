@@ -98,3 +98,15 @@ INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("Cras convallis conval
 INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("ullamcorper magna. Sed eu eros. Nam consequat dolor vitae dolor.",1);
 INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("nisl sem, consequat nec, mollis vitae, posuere at, velit. Cras",1);
 INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("sed dictum eleifend, nunc risus varius orci, in consequat enim",1);
+-- 10 paquetes que no estan en ofertas
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("elit, dictum eu, eleifend",0);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("est ac facilisis facilisis,",0);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("in consectetuer ipsum nunc id enim. Curabitur",1);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("neque. Nullam",1);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("auctor",0);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("adipiscing fringilla, porttitor vulputate, posuere vulputate, lacus.",1);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("ornare,",1);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("eu metus. In lorem. Donec elementum, lorem ut aliquam iaculis, lacus pede sagittis augue, eu",0);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("enim consequat purus. Maecenas libero",0);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("et, rutrum eu, ultrices sit amet, risus.",1);
+INSERT INTO `package` (`p_description`,`dynamic`) VALUES ("vitae velit egestas lacinia. Sed congue, elit sed consequat auctor, nunc nulla vulputate dui,",1);
