@@ -1,6 +1,5 @@
 -- de promo 1 a 10 tienen 1 sola oferta asignada
--- de promo 11 a 20 tienen 2 ofertas asignadas
--- de promo 21 a 30 tienen 3 ofertas asignadas
+-- de promo 11 a 30 tienen 2 ofertas asignadas
 
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (1,1);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (2,2);
@@ -43,7 +42,6 @@ INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (37,17);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (38,18);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (39,19);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (40,20);
--- 3ra asignacion de ofertas 
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (41,21);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (42,22);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (43,23);

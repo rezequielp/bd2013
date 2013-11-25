@@ -15,18 +15,14 @@ BEGIN
     DECLARE currDate DATE;
     SET currDate = CURRENT_DATE();
 
-    CREATE TEMPORARY TABLE tempOffers (
-            `offer_id` SMALLINT UNSIGNED NOT NULL,
-            `o_description` VARCHAR(100) NOT NULL,
-            `price` SMALLINT UNSIGNED NOT NULL,
-            `max_plays` SMALLINT UNSIGNED NOT NULL,
-            `max_time` SMALLINT UNSIGNED NOT NULL,
-            PRIMARY KEY (`offer_id`));
+    CREATE TEMPORARY TABLE tempOffers LIKE offer;
 
     -- La oferta viene con una promo
     IF my_special IS NOT NULL THEN
 
         -- busco todas las ofertas con esta promo (incluida my_offer)
+        -- que estan en el mismo grupo de ofertas que my_offer
+        -- FIXME
         INSERT INTO tempOffers
         SELECT *
         FROM offer NATURAL JOIN
@@ -40,9 +36,10 @@ BEGIN
         INTO bill;
 
         -- Genero una entrada en cli-spe
-        DECLARE benef TINYINT(2) UNSIGNED;
 
         -- obtengo los beneficios que otorga la promo
+        DECLARE benef TINYINT(2) UNSIGNED;
+
         SELECT benefits
         FROM special
         WHERE special_id = my_special
@@ -50,7 +47,7 @@ BEGIN
         INTO benef
 
         -- ya tengo la promo, actualizo los datos
-        IF my_special IN (SELECT special_id FROM cli_spe) THEN
+        IF my_special IN (SELECT special_id FROM cli_spe WHERE client_id = cli_id) THEN
             UPDATE cli_spe
             SET remaining_discounts = benef,
                 initial_date = currDate
@@ -69,7 +66,7 @@ BEGIN
         SELECT offer_id
         FROM tempOffers;
         
-        -- para cada video en cada oferta de la promo, generar la entrada vid_offer_cli  		correspondiente
+        -- para cada video en cada oferta de la promo, generar la entrada vid_cli  		correspondiente
        ALTER TABLE tempOffers2
         ADD COLUMN cli_id SMALLINT UNSIGNED DEFAULT cli_id,
         ADD COLUMN fechaActual DATE DEFAULT currDate;
@@ -82,7 +79,7 @@ BEGIN
             where offer_id = offer.offer_id
 
             for video_id in tabla
-                INSERT INTO vid_offer_cli(video_id, client_id, plays)
+                INSERT INTO vid_cli(video_id, client_id, plays)
                 VALUES(video_id, cli_id, offer.plays)
 
     -- La oferta no viene con promo asignada
@@ -131,19 +128,19 @@ BEGIN
             SET remaining_discounts = remaining_discounts - 1
             WHERE client_id = cli_id AND special_id = my_special
 
-            -- para cada video en la oferta, agregar la entrada en vid_offer_cli correspondiente
+            -- para cada video en la oferta, agregar la entrada en vid_cli correspondiente
             -- ya compro la oferta alguna otra vez, updateo
-            IF my_offer IN (SELECT offer_id FROM vid_offer_cli WHERE client_id = cli_id LIMIT 1) THEN
+            IF my_offer IN (SELECT offer_id FROM vid_cli WHERE client_id = cli_id LIMIT 1) THEN
                 -- se updatean todos los videos que perteneces a my_offer
                 -- no hace falta despaquetar videos si la oferta tiene paquetes
-                UPDATE vid_offer_cli
+                UPDATE vid_cli
                 SET plays = 0,
                     purchase_date = currDate
                 WHERE offer_id = my_offer AND client_id = cli_id;
 
             -- oferta nueva, inserto
             ELSE
-                -- los videos que voy a agregar en vid_offer_cli, sin duplicados
+                -- los videos que voy a agregar en vid_cli, sin duplicados
                 CREATE TEMPORARY TABLE tempVideos_id (
                 `video_id` SMALLINT UNSIGNED NOT NULL,
                 UNIQUE (`video_id`)
@@ -169,8 +166,8 @@ BEGIN
                 ALTER TABLE tempVideos_id ADD COLUMN plays SMALLINT DEFAULT tempOffers.offer_id
                 ALTER TABLE tempVideos_id ADD COLUMN purchase_date DEFAULT currDate,
 
-                -- agrego la lista de video_id que obtuve, en vid_offer_cli
-                INSERT INTO vid_offer_cli(video_id, offer_id, client_id)
+                -- agrego la lista de video_id que obtuve, en vid_cli
+                INSERT INTO vid_cli(video_id, offer_id, client_id)
                     SELECT *
                     FROM tempVideos_id
             END IF

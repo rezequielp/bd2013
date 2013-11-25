@@ -1,1 +1,1 @@
-mysql -udb2013g13 -pdb2013g13 -hkali db2013g13
+mysql -udb2013g08 -pdb2013g08 -hkali db2013g08
