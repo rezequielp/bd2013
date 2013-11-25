@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `vid_pkg` (
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
--- Table Vid-Offer-Cli
+-- Table Vid-Cli
 -- -----------------------------------------------------
 -- AGREGAR `max_plays` A LA DOC
 -- AGREGAR `deadline` A LA DOC
