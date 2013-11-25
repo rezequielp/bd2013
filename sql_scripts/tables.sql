@@ -34,8 +34,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table Offer
 -- -----------------------------------------------------
--- max_time son la cantidad  de horas cuando se pueden reproducir los elementos
--- de la oferta comenzando de la fehca de compra 
+-- max_time son la cantidad de dias que se pueden reproducir los elementos
 DROP TABLE IF EXISTS `offer` ;
 
 CREATE TABLE IF NOT EXISTS `offer` (
@@ -64,13 +63,14 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `special` ;
 
+-- max_time son la cantidad de dias que se pueden reproducir los elementos
+
 CREATE TABLE IF NOT EXISTS `special` (
   `special_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `requires` TINYINT(2) UNSIGNED NOT NULL,
   `benefits` TINYINT(2) UNSIGNED NOT NULL,
   `discount` TINYINT(3) UNSIGNED NOT NULL,
-  `deadline` DATE NOT NULL,
-  `duration` TINYINT(2) UNSIGNED NOT NULL,
+  `max_time` SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY (`special_id`))
 DEFAULT CHARACTER SET = utf8;
 
@@ -104,18 +104,13 @@ DROP TABLE IF EXISTS `vid_cli` ;
 
 CREATE TABLE IF NOT EXISTS `vid_cli` (
   `video_id` SMALLINT UNSIGNED NOT NULL,
-  `offer_id` SMALLINT UNSIGNED NOT NULL,
   `client_id` SMALLINT UNSIGNED NOT NULL,
-  `plays` SMALLINT UNSIGNED NOT NULL,
+  `plays` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   `max_plays` SMALLINT UNSIGNED NOT NULL,
   `deadline` DATE NOT NULL,
-  PRIMARY KEY (`video_id`, `offer_id`, `client_id`),
+  PRIMARY KEY (`video_id`, `client_id`),
   FOREIGN KEY (`video_id`)
     REFERENCES `video`(`video_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`offer_id`)
-    REFERENCES `offer`(`offer_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   FOREIGN KEY (`client_id`)
@@ -208,12 +203,14 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `cli_spe` ;
 
+-- deadline, fecha calendario que caduca
+-- solo client_id es primary key para forzar solo una promo activa por cliente
 CREATE TABLE IF NOT EXISTS `cli_spe` (
   `client_id` SMALLINT UNSIGNED NOT NULL,
   `special_id` SMALLINT UNSIGNED NOT NULL,
   `remaining_discounts` TINYINT(2) UNSIGNED NOT NULL,
-  `initial_date` DATE NOT NULL,
-  PRIMARY KEY (`client_id`, `special_id`),
+  `deadline` DATE NOT NULL,
+  PRIMARY KEY (`client_id`),
   FOREIGN KEY (`client_id`)
     REFERENCES `client`(`client_id`)
     ON DELETE CASCADE

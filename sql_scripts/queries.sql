@@ -108,19 +108,11 @@ SELECT offer_id, COUNT(*) AS o_count
 FROM offer_cli
 GROUP BY offer_id;
 
------------------------------------------------------------
-CREATE TEMPORARY TABLE temp1
-    (SELECT video_id, offer_id
-    FROM num_purchased_offers NATURAL JOIN vid_offer);
-
-CREATE TEMPORARY TABLE temp2
-    (SELECT video_id, offer_id
-    FROM num_purchased_offers NATURAL JOIN pkg_offer NATURAL JOIN vid_pkg);
------------------------------------------------------------
-
 -- estos son los videos que estan en una oferta que fue comprada
 CREATE TEMPORARY TABLE videos_on_purchased_offers
-    (select * from temp1) UNION (select * from temp2);
+    (SELECT video_id, offer_id FROM vid_offer NATURAL JOIN offer_cli)
+    UNION
+    (SELECT video_id, offer_id FROM vid_pkg NATURAL JOIN pkg_offer NATURAL JOIN offer_cli);
 
 -- Aca el natural join es por offer_id, lo que genera una tabla con la veces que
 -- fue obtenido ese video_id por la cant de veces que fue comprada esa oferta
@@ -130,52 +122,42 @@ FROM num_purchased_offers NATURAL JOIN videos_on_purchased_offers
 GROUP BY video_id
 ORDER BY video_id DESC;
 
-DROP TABLE temp1;
-DROP TABLE temp2;
--- las necesita la consulta de abajo
--- DROP TABLE num_purchased_offers;
--- DROP TABLE videos_on_purchased_offers;
-
-
 -----------------------------------------------------------
 -- Movies with maximum purchases
 -- (uso los 2 temp table de la query "Most purchased movies")
 -----------------------------------------------------------
 --ESTAS CONSULTAS NO ANDAN
 
--- FIXME temp1 y temp2 son ahora
--- num_purchased_offers, videos_on_purchased_offers
-SELECT video_id, SUM(o_count) AS purchased_count
-FROM temp1 NATURAL JOIN temp2
-GROUP BY video_id;
-HAVING purchased_count IN (SELECT MAX(o_count)
-FROM )
-
 -- la cantidad de veces que fue comprado cada video
-CREATE TEMPORARY TABLE temp3
-    (video_id SMALLINT UNSIGNED NOT NULL PRIMARY KEY,
-    purchased_count SMALLINT UNSIGNED NOT NULL);
-
--- el valor (cant. de compra) del video mas comprado
-CREATE TEMPORARY TABLE temp4
-    (max_purchased SMALLINT UNSIGNED NOT NULL);
-
-INSERT INTO temp3 (video_id, purchased_count)
+CREATE TEMPORARY TABLE temp1
     SELECT video_id, SUM(o_count) AS purchased_count
-    FROM temp1 NATURAL JOIN temp2
+    FROM num_purchased_offers NATURAL JOIN videos_on_purchased_offers
     GROUP BY video_id;
 
-INSERT INTO temp4 (max_purchased)
+-- el valor (cant. de compra) del video mas comprado
+CREATE TEMPORARY TABLE temp2
     SELECT MAX(purchased_count)
     FROM temp1
     LIMIT 1;
 
 SELECT video_id, purchased_count
-FROM temp3
+FROM temp1
 WHERE purchased_count IN (SELECT * FROM temp2);
 
-DROP TABLE temp3;
-DROP TABLE temp4;
+
+-- Otra forma usando num_purchased_offers, videos_on_purchased_offers y temp1
+SELECT video_id, SUM(o_count) AS purchased_count
+FROM num_purchased_offers NATURAL JOIN videos_on_purchased_offers
+GROUP BY video_id
+HAVING purchased_count IN (SELECT MAX(o_count)
+                            FROM temp1);
+
+
+
+DROP TABLE temp1;
+DROP TABLE temp2;
+DROP TABLE num_purchased_offers;
+DROP TABLE videos_on_purchased_offers;
 
 -----------------------------------------------------------
 -- Clients according their plays
