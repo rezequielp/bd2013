@@ -36,7 +36,6 @@ BEGIN
         INTO bill;
 
         -- Genero una entrada en cli-spe
-
         -- obtengo los beneficios que otorga la promo
         DECLARE benef TINYINT(2) UNSIGNED;
 
@@ -61,16 +60,16 @@ BEGIN
         -- esta tabla es una copia de tempoOffers (no se para que la necesitabamos)
         CREATE TEMPORARY TABLE tempOffers2 (
             `offer_id` SMALLINT UNSIGNED NOT NULL;
-    
+
         INSERT INTO tempOffers2
         SELECT offer_id
         FROM tempOffers;
-        
-        -- para cada video en cada oferta de la promo, generar la entrada vid_cli  		correspondiente
+
+        -- para cada video en cada oferta de la promo, generar la entrada vid_cli correspondiente
        ALTER TABLE tempOffers2
         ADD COLUMN cli_id SMALLINT UNSIGNED DEFAULT cli_id,
         ADD COLUMN fechaActual DATE DEFAULT currDate;
-        
+
         -- PSEUDOCODIGO (ESTO CAMBIARLO)
         for offer in tempOffers:
             tabla =
