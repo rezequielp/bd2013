@@ -208,5 +208,14 @@ from
     UNION
     (SELECT video_id, offer_id FROM vid_pkg NATURAL JOIN pkg_offer)) as t
 where
-    offer_id = 1 or offer_id = 2;
+    offer_id = 32
+order by offer_id;
+
+
+select *
+from
+((SELECT video_id, offer_id FROM vid_offer)
+    UNION
+    (SELECT video_id, offer_id FROM vid_pkg NATURAL JOIN pkg_offer)) as t
+where video_id = 400;
 order by offer_id;

@@ -56,8 +56,10 @@ BEGIN
         INTO special_max_time;
 
         INSERT INTO cli_spe
-            VALUES (my_client, my_special, benef, DATE_ADD(CURDATE(), INTERVAL special_max_time DAY))
+            VALUES (my_client, my_special, benef, 
+                    DATE_ADD(CURDATE(), INTERVAL special_max_time DAY))
             ON DUPLICATE KEY UPDATE
+                special_id = my_special,
                 remaining_discounts = benef,
                 deadline = DATE_ADD(CURDATE(), INTERVAL special_max_time DAY);
 
@@ -93,15 +95,12 @@ BEGIN
 
         -- Inserto o updateo los videos en vid_cli los videos de las ofertas compradas
         INSERT INTO vid_cli
-            SELECT video_id, my_client, 0, max_plays, DATE_ADD(CURDATE(), INTERVAL max_time DAY)
+            SELECT video_id, my_client, 0, max_plays, 
+                    DATE_ADD(CURDATE(), INTERVAL max_time DAY)
             FROM purchased_videos NATURAL JOIN purchased_offers
         ON DUPLICATE KEY UPDATE
-            vid_cli.special_id = my_special,
             vid_cli.max_plays = vid_cli.max_plays + purchased_offers.max_plays,
             vid_cli.deadline = DATE_ADD(CURDATE(), INTERVAL purchased_offers.max_time DAY);
-
-        END IF;
-
     END IF;
 select * from cli_spe;
 select * from offer_cli;

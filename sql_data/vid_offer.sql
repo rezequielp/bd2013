@@ -104,3 +104,11 @@ INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (97,71);
 INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (98,70);
 INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (99,69);
 INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (100,68);
+
+-- un mismo video en 2 ofertas
+INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (397,34);
+INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (398,34);
+INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (398,33);
+INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (399,31);
+INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (400,31);
+INSERT INTO `vid_offer` (`video_id`,`offer_id`) VALUES (400,32);

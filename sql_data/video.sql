@@ -399,4 +399,8 @@ INSERT INTO `video` (`title`,`genre`) VALUES ("magna."," Comedy ");
 INSERT INTO `video` (`title`,`genre`) VALUES ("nulla. Cras eu tellus eu augue porttitor interdum."," Horror");
 INSERT INTO `video` (`title`,`genre`) VALUES ("vitae purus gravida sagittis. Duis gravida. Praesent eu"," Horror");
 INSERT INTO `video` (`title`,`genre`) VALUES ("Proin"," Horror");
+INSERT INTO `video` (`title`,`genre`) VALUES ("Proin"," Horror");
+
+-- este video esta en 2 ofertas
 INSERT INTO `video` (`title`,`genre`) VALUES ("consequat purus. Maecenas libero est, congue a,"," Adventure ");
+
