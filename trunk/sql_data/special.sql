@@ -9,7 +9,6 @@ INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (1,1,
 INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (1,2,70,25);
 INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (1,3,57,24);
 INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (1,3,63,4);
-
 INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (2,4,71,23);
 INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (2,5,48,7);
 INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (2,4,9,20);
@@ -30,5 +29,3 @@ INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (2,5,
 INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (2,1,51,5);
 INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (2,2,6,4);
 INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (2,1,72,13);
-INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (2,5,28,2);
-INSERT INTO `special` (`requires`,`benefits`,`discount`,`max_time`) VALUES (2,2,89,28);

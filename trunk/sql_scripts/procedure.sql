@@ -87,7 +87,7 @@ BEGIN
         INSERT INTO tempOffers
         SELECT *
         FROM offer
-        WHERE offer_id = my_offer);
+        WHERE offer_id = my_offer;
 
         -- ver en cli_spe si existen entradas con M>0
         -- chequear en special si la fecha caduco. (uso modo 2)
@@ -119,7 +119,7 @@ BEGIN
             FROM Offer,
                 (SELECT discount
                  FROM tempCli_SpeJoinSpe) AS t
-            WHERE Offer.offer_id == my_offer
+            WHERE Offer.offer_id = my_offer
             INTO bill;
 
             -- decremento M, en cli_spe
