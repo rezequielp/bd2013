@@ -32,9 +32,9 @@ INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (28,28);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (29,29);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (30,30);
 -- 2das asignacion de ofertas
--- estas ofertas no tienen videos ni paquetes asignados!
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (31,11);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (32,12);
+-- estas ofertas no tienen videos ni paquetes asignados!!!
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (33,13);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (34,14);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (35,15);
