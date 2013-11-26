@@ -1,15 +1,15 @@
-USE `bd2013`;
-DROP procedure IF EXISTS `get_offer`;
+USE `bd2013` ;
+DROP procedure IF EXISTS `get_bill` ;
 
 DELIMITER $$
 USE `bd2013`$$
 
 -- FIXME BILL Y PRICE DEBERIAN SER FLOAT?
 -- Suponemos que my_offer tiene la promo my_special o my_special is NULL
-CREATE PROCEDURE `get_offer` (IN my_client SMALLINT,
-                                IN my_offer SMALLINT,
-                                IN my_special SMALLINT,
-                                OUT bill SMALLINT)
+CREATE PROCEDURE `get_bill` (IN my_client SMALLINT,
+                             IN my_offer SMALLINT,
+                             IN my_special SMALLINT,
+                             OUT bill SMALLINT)
 BEGIN
 
     DECLARE benef TINYINT(2);
@@ -25,9 +25,9 @@ BEGIN
     DROP TABLE IF EXISTS purchased_offers;
     CREATE TEMPORARY TABLE purchased_offers LIKE offer;
 
-    -- -------------------------------------------------------------------------
+    -- ------------------------------------------------------------------------
     -- Si la oferta venia con una promo
-    -- -------------------------------------------------------------------------
+    -- ------------------------------------------------------------------------
     IF my_special IS NOT NULL THEN
         -- Busco todas las ofertas con esta promo (incluida my_offer)
         -- que estan en el mismo grupo de ofertas que my_offer
@@ -35,17 +35,17 @@ BEGIN
         SELECT *
         FROM offer NATURAL JOIN
             (SELECT offer_id
-            FROM offer_spe
-            WHERE special_id = my_special) AS t;
+             FROM offer_spe
+             WHERE special_id = my_special) AS t;
 
         -- Sumo todos los precios de las ofertas
         SELECT SUM(price)
         FROM offers_with_special
         INTO bill;
 
-        -- ---------------------------------------------------------------------
+        -- --------------------------------------------------------------------
         -- Genero una entrada en cli-spe:
-        -- ---------------------------------------------------------------------
+        -- --------------------------------------------------------------------
         -- Obtengo los beneficios que otorga la promo
         SELECT benefits
         FROM special
@@ -59,17 +59,14 @@ BEGIN
         INTO special_max_time;
 
         INSERT INTO cli_spe
-            VALUES (my_client, my_special, benef,
-                    DATE_ADD(CURDATE(), INTERVAL special_max_time DAY))
-            ON DUPLICATE KEY UPDATE
-                special_id = my_special,
-                remaining_discounts = benef,
-                deadline = DATE_ADD(CURDATE(), INTERVAL special_max_time DAY);
+        VALUES (my_client, my_special, benef,
+                DATE_ADD(CURDATE(), INTERVAL special_max_time DAY))
+        ON DUPLICATE KEY UPDATE
+            special_id = my_special,
+            remaining_discounts = benef,
+            deadline = DATE_ADD(CURDATE(), INTERVAL special_max_time DAY);
 
-        -- ---------------------------------------------------------------------
-        -- Para cada video y cada oferta de la promo, genero la entrada
-        -- vid_cli, offer_cli correspondiente:
-        -- ---------------------------------------------------------------------
+        -- Esto sirve para agregar en offer_cli, vid_cli:
         -- Inserto todas las ofertas de esta promo
         -- siempre y cuando no haya sido comprada en este mismo dia
         -- ASI ANDA!
@@ -78,11 +75,12 @@ BEGIN
         FROM offers_with_special
         WHERE offer_id NOT IN
             (SELECT offer_id
-            FROM offer_cli
-            WHERE client_id = my_client AND purchase_date = CURDATE());
+             FROM offer_cli
+             WHERE client_id = my_client AND purchase_date = CURDATE());
 
-
+    -- ------------------------------------------------------------------------
     -- Si la oferta no viene con promo asignada
+    -- ------------------------------------------------------------------------
     ELSE
         -- Obtengo la oferta a comprar (es una sola)
         INSERT INTO purchased_offers
@@ -90,14 +88,14 @@ BEGIN
         FROM offer
         WHERE offer_id NOT IN
             (SELECT offer_id
-            FROM offer_cli
-            WHERE client_id = my_client AND purchase_date = CURDATE())
+             FROM offer_cli
+             WHERE client_id = my_client AND purchase_date = CURDATE())
         AND offer_id = my_offer;
 
-
+        -- Si no compro la oferta en el mismo dia
         IF EXISTS (SELECT * FROM purchased_offers) THEN
-            -- ver en cli_spe si existen entradas con M>0
-            -- chequear en special si la fecha caduco.
+
+            -- Buscar en cli_spe si existen entradas de special validas
             CREATE TEMPORARY TABLE clients_special
                 SELECT *
                 FROM cli_spe NATURAL JOIN special
@@ -105,15 +103,16 @@ BEGIN
                       AND CURDATE() < deadline
                       AND client_id = my_client;
 
-            -- si el cliente tiene una promo valida activa
+            -- Si el cliente tiene una promo valida activa
             IF EXISTS (SELECT * FROM clients_special) THEN
 
-                -- Busco el descuento de esta promo en special
-                -- ( ESTO SE DEVUELVE) aplico el desc al precio de my_offer, en la tabla offer
+                -- Busco el descuento de esta promo en special y lo aplico al
+                -- precio de my_offer, en las ofertas compradas
                 UPDATE purchased_offers JOIN
                     (SELECT discount FROM clients_special) AS t
                 SET price = price * (1 - discount/ 100);
 
+                -- Devuelvo la cuenta a cobrar
                 SELECT price FROM purchased_offers INTO bill;
 
                 -- Decremento por el uso del descuento
@@ -122,12 +121,17 @@ BEGIN
                 WHERE client_id = my_client;
 
             END IF;
-        -- si ya compro la oferta el mismo dia, no hago nada (DEVUELVO MENSAJE)
+        -- Si ya compro la oferta en el mismo dia, no hago nada (DEVUELVO MENSAJE)
         ELSE
             SELECT "NO PUEDES COMPRAR UNA OFERTA MAS DE UNA VEZ POR DIA";
 
         END IF;
     END IF;
+
+    -- ------------------------------------------------------------------------
+    -- Para cada video y cada oferta de la promo, genero la entrada
+    -- vid_cli, offer_cli correspondiente:
+    -- ------------------------------------------------------------------------
 
     -- Registro las ofertas compradas con el precio calculado
     INSERT INTO offer_cli
@@ -138,9 +142,11 @@ BEGIN
     CREATE TEMPORARY TABLE purchased_videos
         SELECT video_id, offer_id
         FROM
-            ((SELECT video_id, offer_id FROM vid_offer)
+            ((SELECT video_id, offer_id
+              FROM vid_offer)
             UNION
-            (SELECT video_id, offer_id FROM vid_pkg NATURAL JOIN pkg_offer)) AS t1
+             (SELECT video_id, offer_id
+              FROM vid_pkg NATURAL JOIN pkg_offer)) AS t
             NATURAL JOIN purchased_offers;
 
     -- Inserto o updateo los videos en vid_cli los videos de las ofertas compradas
@@ -155,5 +161,8 @@ END$$
 
 DELIMITER ;
 
--- source /home/eze/BD2013/svn/test.sql
+-- select * from cli_spe;
+-- select * from offer_cli;
+-- select * from vid_cli;
+
 -- CALL get_offer_1 (1, 1, 1, @bill);
