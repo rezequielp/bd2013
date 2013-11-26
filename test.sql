@@ -11,95 +11,104 @@ CREATE PROCEDURE `get_offer_1` (IN my_client SMALLINT,
                                 IN my_special SMALLINT,
                                 OUT bill SMALLINT)
 BEGIN
-    DECLARE currDate DATE;
-    SET currDate = CURDATE();
 
-    DROP TABLE IF EXISTS tempOffers;
-    CREATE TEMPORARY TABLE tempOffers LIKE offer;
+    DECLARE benef TINYINT(2);
+    DECLARE special_max_time SMALLINT UNSIGNED;
 
-    ---------------------------------------------------------------------------
+    DROP TABLE IF EXISTS offers_with_special;
+    DROP TABLE IF EXISTS purchased_offers;
+    DROP TABLE IF EXISTS purchased_videos;
+    DROP TABLE IF EXISTS videos_to_insert;
+    DROP TABLE IF EXISTS videos_to_update;
+
+    -- -------------------------------------------------------------------------
     -- Si la oferta venia con una promo
-    ---------------------------------------------------------------------------
-    IF (my_special IS NOT NULL) THEN
+    -- -------------------------------------------------------------------------
+    IF my_special IS NOT NULL THEN
         -- Busco todas las ofertas con esta promo (incluida my_offer)
         -- que estan en el mismo grupo de ofertas que my_offer
-        INSERT INTO tempOffers
-            SELECT *
-            FROM offer NATURAL JOIN
-                (SELECT offer_id
-                FROM offer_spe
-                WHERE special_id = my_special) AS t;
+        CREATE TEMPORARY TABLE offers_with_special
+        SELECT *
+        FROM offer NATURAL JOIN
+            (SELECT offer_id
+            FROM offer_spe
+            WHERE special_id = my_special) AS t;
 
         -- Sumo todos los precios de las ofertas
         SELECT SUM(price)
-        FROM tempOffers
+        FROM offers_with_special
         INTO bill;
 
-        ------------------------------------------------------------------------
+        -- ---------------------------------------------------------------------
         -- Genero una entrada en cli-spe:
-        ------------------------------------------------------------------------
+        -- ---------------------------------------------------------------------
         -- Obtengo los beneficios que otorga la promo
-        DECLARE benef TINYINT(2);
         SELECT benefits
         FROM special
         WHERE special_id = my_special
+        LIMIT 1
         INTO benef;
 
         -- Obtengo el max_time de la promo
-        DECLARE special_max_time;
         SELECT max_time
         FROM special
-        WHERE special_id = my_special;
+        WHERE special_id = my_special
+        INTO special_max_time;
 
-        -- Si ya tengo la promo, actualizo los datos
-        IF my_special IN (SELECT special_id
-                          FROM cli_spe
-                          WHERE client_id = my_client) THEN
+        INSERT INTO cli_spe
+            VALUES (my_client, my_special, benef, DATE_ADD(CURDATE(), INTERVAL special_max_time DAY))
+            ON DUPLICATE KEY UPDATE
+                remaining_discounts = benef,
+                deadline = DATE_ADD(CURDATE(), INTERVAL special_max_time DAY);
 
-            UPDATE cli_spe
-            SET remaining_discounts = benef
-                deadline = DATE_ADD(currDate, INTERVAL special_max_time DAY)
-            WHERE special_id = my_special;
-
-        ELSE -- No la tengo, la agrego
-            INSERT INTO cli_spe (client_id, special_id, remaining_discounts, initial_date)
-            VALUES (my_client, my_special, benef, DATE_ADD(currDate, INTERVAL special_max_time DAY);
-        END IF
-
-        ------------------------------------------------------------------------
+        -- ---------------------------------------------------------------------
         -- Para cada video y cada oferta de la promo, genero la entrada
         -- vid_cli, offer_cli correspondiente:
-        ------------------------------------------------------------------------
-        -- videos que estan en ofertas correspondientes a mi promo
-        CREATE TEMPORARY TABLE videos_from_special
-            SELECT *
-            FROM
-                (SELECT video_id, offer_id FROM vid_offer) AS t1
-                UNION
-                (SELECT video_id, offer_id FROM vid_pkg NATURAL JOIN pkg_offer) AS t2
-            NATURAL JOIN offer_spe
-            WHERE special_id = my_special;
-
---         CREATE TEMPORARY TABLE asdasd
---         SELECT *
---         FROM offered_videos NATURAL JOIN offer_spe
---         WHERE special_id = my_special
-
-        -- Inserto todos los videos de esta promo
-        INSERT INTO vid_cli
-            SELECT video_id, client_id, 0, max_plays, DATE_ADD(currDate, INTERVAL max_time DAY)
-            FROM videos_from_special NATURAL JOIN offer;
-
+        -- ---------------------------------------------------------------------
         -- Inserto todas las ofertas de esta promo
         -- TODO deberia chequear si alguna de estas fue comprada en este mismo
         -- dia, si es asi, la updateo
-        INSERT INTO offer_cli
-            SELECT offer_id, client_id, currDate, price
-            FROM cli_spe NATURAL JOIN offer_spe NATURAL JOIN offer;
+        -- ASI ANDA!
+        CREATE TEMPORARY TABLE purchased_offers
+            SELECT *
+            FROM offers_with_special
+            WHERE offer_id
+            NOT IN
+                (SELECT offer_id
+                FROM offer_cli
+                WHERE client_id = my_client AND purchase_date = CURDATE());
 
-            --FROM videos_from_special NATURAL JOIN offer_cli NATURAL JOIN offer;
-        END IF
+        INSERT INTO offer_cli
+            SELECT offer_id, my_client, CURDATE(), price
+            FROM purchased_offers;
+
+        -- videos que estan en ofertas correspondientes a mi promo
+        CREATE TEMPORARY TABLE purchased_videos
+            SELECT video_id, offer_id
+            FROM
+                ((SELECT video_id, offer_id FROM vid_offer)
+                UNION
+                (SELECT video_id, offer_id FROM vid_pkg NATURAL JOIN pkg_offer)) AS t1
+                NATURAL JOIN purchased_offers;
+
+        -- Inserto o updateo los videos en vid_cli los videos de las ofertas compradas
+        INSERT INTO vid_cli
+            SELECT video_id, my_client, 0, max_plays, DATE_ADD(CURDATE(), INTERVAL max_time DAY)
+            FROM purchased_videos NATURAL JOIN purchased_offers
+        ON DUPLICATE KEY UPDATE
+            vid_cli.special_id = my_special,
+            vid_cli.max_plays = vid_cli.max_plays + purchased_offers.max_plays,
+            vid_cli.deadline = DATE_ADD(CURDATE(), INTERVAL purchased_offers.max_time DAY);
+
+        END IF;
+
+    END IF;
+select * from cli_spe;
+select * from offer_cli;
+select * from vid_cli;
 END$$
 
 DELIMITER ;
 
+-- source /home/eze/BD2013/svn/test.sql
+-- CALL get_offer_1 (1, 1, 1, @bill);

@@ -1,5 +1,5 @@
 -- de promo 1 a 10 tienen 1 sola oferta asignada
--- de promo 11 a 30 tienen 2 ofertas asignadas
+-- de promo 11 a 31 tienen 2 ofertas asignadas
 
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (1,1);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (2,2);
@@ -32,6 +32,7 @@ INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (28,28);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (29,29);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (30,30);
 -- 2das asignacion de ofertas
+-- estas ofertas no tienen videos ni paquetes asignados!
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (31,11);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (32,12);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (33,13);
@@ -52,3 +53,7 @@ INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (47,27);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (48,28);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (49,29);
 INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (50,30);
+
+-- ofertas con 2 promo
+INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (49,31);
+INSERT INTO `offer_spe` (`offer_id`,`special_id`) VALUES (50,31);

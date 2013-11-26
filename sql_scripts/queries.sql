@@ -199,3 +199,14 @@ UNION
 (SELECT video_id, offer_id
 FROM vid_offer)
 ORDER BY offer_id;
+
+
+-- videos que estan en una oferta espicificada
+select *
+from
+((SELECT video_id, offer_id FROM vid_offer)
+    UNION
+    (SELECT video_id, offer_id FROM vid_pkg NATURAL JOIN pkg_offer)) as t
+where
+    offer_id = 1 or offer_id = 2;
+order by offer_id;
