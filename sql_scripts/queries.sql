@@ -202,19 +202,18 @@ ORDER BY offer_id;
 
 
 -- videos que estan en una oferta espicificada
-select *
+select *, count(*)
 from
-((SELECT video_id, offer_id FROM vid_offer)
+    ((SELECT video_id, offer_id FROM vid_offer)
     UNION
     (SELECT video_id, offer_id FROM vid_pkg NATURAL JOIN pkg_offer)) as t
-where
-    offer_id = 32
+group by offer_id
 order by offer_id;
 
 
 select *
 from
-((SELECT video_id, offer_id FROM vid_offer)
+    ((SELECT video_id, offer_id FROM vid_offer)
     UNION
     (SELECT video_id, offer_id FROM vid_pkg NATURAL JOIN pkg_offer)) as t
 where video_id = 400;
