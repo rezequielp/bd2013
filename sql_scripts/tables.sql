@@ -2,9 +2,9 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
-DROP SCHEMA IF EXISTS bd2013 ;
-CREATE SCHEMA IF NOT EXISTS bd2013 ;
-USE bd2013 ;
+DROP SCHEMA IF EXISTS `bd2013` ;
+CREATE SCHEMA IF NOT EXISTS `bd2013` ;
+USE `bd2013` ;
 
 -- -----------------------------------------------------
 -- Table Video
@@ -34,7 +34,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table Offer
 -- -----------------------------------------------------
--- max_time son la cantidad de dias que se pueden reproducir los elementos
+-- max_time es la cantidad de dias que se pueden reproducir los elementos
 DROP TABLE IF EXISTS `offer` ;
 
 CREATE TABLE IF NOT EXISTS `offer` (
@@ -61,9 +61,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table Special
 -- -----------------------------------------------------
+-- max_time es la cantidad de dias que se pueden reproducir los elementos
 DROP TABLE IF EXISTS `special` ;
-
--- max_time son la cantidad de dias que se pueden reproducir los elementos
 
 CREATE TABLE IF NOT EXISTS `special` (
   `special_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -98,7 +97,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- AGREGAR `max_plays` A LA DOC
 -- AGREGAR `deadline` A LA DOC
--- plays y max_plays no se resetean, uno cuenta la cant. de repr. hechas y el otro las max permitidas
+-- plays y max_plays no se resetean, uno cuenta la cant. de repr. hechas y el
+-- otro las max permitidas
 -- deadline tiempo calendario que marca el vencimiento de la activacion del video
 DROP TABLE IF EXISTS `vid_cli` ;
 
@@ -201,10 +201,10 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table Cli-Spe
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `cli_spe` ;
-
 -- deadline, fecha calendario que caduca
 -- solo client_id es primary key para forzar solo una promo activa por cliente
+DROP TABLE IF EXISTS `cli_spe` ;
+
 CREATE TABLE IF NOT EXISTS `cli_spe` (
   `client_id` SMALLINT UNSIGNED NOT NULL,
   `special_id` SMALLINT UNSIGNED NOT NULL,

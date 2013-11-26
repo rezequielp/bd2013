@@ -492,12 +492,12 @@ CREATE PROCEDURE `rewards_report` (
     , OUT count_rewardees INT
 )
 LANGUAGE SQL
-NOT DETERMINISTIC 
+NOT DETERMINISTIC
 READS SQL DATA
 SQL SECURITY DEFINER
 COMMENT 'Provides a customizable report on best customers'
 proc: BEGIN
-    
+
     DECLARE last_month_start DATE;
     DECLARE last_month_end DATE;
 
@@ -541,8 +541,8 @@ proc: BEGIN
         Output ALL customer information of matching rewardees.
         Customize output as needed.
     */
-    SELECT c.* 
-    FROM tmpCustomer AS t   
+    SELECT c.*
+    FROM tmpCustomer AS t
     INNER JOIN customer AS c ON t.customer_id = c.customer_id;
 
     /* Clean up */
